@@ -33,6 +33,18 @@ class Order(models.Model):
     complete = models.BooleanField(default=False)
     transaction_id = models.CharField(max_length=200, null=True)
 
+    @property
+    def cart_total_price(self):
+        items = self.orderitem_set.all()
+        total = sum([item.get_total for item in items])
+        return total
+    
+    @property
+    def cart_total_number(self):
+        items = self.orderitem_set.all()
+        total = sum([item.quantity for item in items])
+        return total
+
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
@@ -42,6 +54,8 @@ class OrderItem(models.Model):
     @property
     def get_total(self):
         return round(self.product.price * self.quantity, 2)
+    
+    
 
 
 class ShippingAddress(models.Model):
